@@ -1,0 +1,80 @@
+UNIX BUILD NOTES
+================
+Some notes on how to build the Bitcoin Messaging System in Unix. 
+
+
+To Build
+--------
+
+  cd build
+  cmake ..
+  make -j4
+
+If you wish to install the system later on in a directory of your choice, then set
+the variable CMAKE_INSTALL_PREFIX during the configuration as follows:
+
+  cmake -DCMAKE_INSTALL_PREFIX:PATH=<PATH> ..
+  make -j4
+
+This will build the Bitcoin Messaging System if the dependencies listed in the next
+section are met.
+
+
+Dependencies
+------------
+- g++
+- cmake
+- curl
+- libssl
+- libboost
+
+
+Dependency Build Instructions: Ubuntu & Debian
+----------------------------------------------
+
+Build requirements:
+
+  sudo apt-get install g++
+  sudo apt-get install cmake
+  sudo apt-get install libcurl4-openssl-dev
+  sudo apt-get install libboost-all-dev
+  sudo apt-get install libssl-dev
+
+
+To Install
+----------
+
+  sudo make install
+
+By executing 'make install' the following files will be installed into '/usr/local' on Linux-based systems and into '/opt/local' on Darwin-based systems, unless during the Cmake configuration phase a different installation path has been specified:
+  - /usr/local/bms/bms
+  - /usr/local/bms/config/bms.conf
+  - /usr/local/bms/config/huffcode.map
+
+
+Configuring the Bitcoin Daemon and the Messaging System
+-------------------------------------------------------
+1) Copy 'bitcoin.conf' to the bitcoin installation directory (default '~/.bitcoin')
+2) Set the following parameters in the copied 'bitcoin.conf' file:
+   - MANDATORY:
+     a.1) rpcuser (Set to a username of your own choice)
+     a.2) rpcpassword (Set to a password of your own choice)
+   - OPTIONAL:
+     b.1) rpcport (Any feasible port of your choice)
+3) Set the following parameters in the 'bms.conf' file:
+   - MANDATORY:
+     a.1) Wallet.User (Set to the same as 'rpcuser' above)
+     a.2) Wallet.Password (Set to the same as 'rpcpassword' above)
+   - OPTIONAL:
+     b.1) Wallet.Port (Set to the same as 'rpcport' above)
+     b.2) TxFeeRate (Set to the desired transaction fee rate in Satoshi per kB)
+   - NOT RECOMMENDED:
+     c.1) Keymap.SuffixBits (Set to the desired number of controlled suffix bits of the public key)
+     c.2) Random.SuffixBits (Set to the desired number of random suffix bits of the public key)
+
+Notes:
+3.b.2) The transaction fee rate is set to the current default of 10000 Satoshi per kB and is recommended to remain the same unless the average fee rate is much higher and it takes too long for the transactions to be included in the blockchain.
+3.c.1) The number of controlled suffix bits of the public key (with corresponding private key) can, if desired, be increased beyond 8 bits. However, due to the exponential runtime and space complexity the required time and space for the computation will increase with each bit by a factor of two.
+3.c.2) The number of random suffix bits of the public key (without corresponding public key) should remain the same. An increase of its value would reduce the number of bits included in each public key and thus increase the costs whereas a decrease might render parts of the included data indecipherable.
+
+Finally, it is important to note that 3.c.1) as well 3.c.2) are global configuration parameters, which means that in order for a user to correctly read messages he needs to know their values. For this reason the best strategy is to retain these unchanged.
